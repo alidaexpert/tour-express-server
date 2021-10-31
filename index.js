@@ -25,13 +25,32 @@ async function run() {
       await client.connect();
       const database = client.db("Tour-Express");
       const offers = database.collection("offers");
-      // create a document to insert
-    //   const doc = {
-    //     title: "Record of a Shriveled Datum",
-    //     content: "No bytes, no problem. Just insert a document, in MongoDB",
-    //   }
-    //   const result = await haiku.insertOne(doc);
-    //   console.log(`A document was inserted with the _id: ${result.insertedId}`);
+      const banner = database.collection("banner");
+      const gallery = database.collection("gallery");
+      const tourTeam = database.collection("tour-team");
+      
+    app.get("/offers",async(req,res)=>{
+      const result=await offers.find({}).toArray()
+      res.json(result)
+    })
+    app.get("/banner",async(req,res)=>{
+      const result=await banner.find({}).toArray()
+      res.json(result)
+    })
+    app.get("/gallery",async(req,res)=>{
+      const result=await gallery.find({}).toArray()
+      res.json(result)
+    })
+    app.get("/tour-team",async(req,res)=>{
+      const result=await tourTeam.find({}).toArray()
+      res.json(result)
+    })
+    app.get("/offers/:id",async(req,res)=>{
+      const id=req.params.id
+      const query={_id:ObjectId(id)}
+      const result=await offers.findOne(query)
+      res.json(result)
+    })
     } finally {
     //   await client.close();
     }
