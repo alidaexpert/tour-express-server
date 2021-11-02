@@ -30,8 +30,13 @@ async function run() {
       const tourTeam = database.collection("tour-team");
       
     app.get("/offers",async(req,res)=>{
-      const result=await offers.find({}).toArray()
-      res.json(result)
+      const count=await offers.find({}).count()
+
+      const offer=await offers.find({}).toArray()
+      res.json({
+        count,
+        offer
+      })
     })
     app.get("/banner",async(req,res)=>{
       const result=await banner.find({}).toArray()
@@ -51,6 +56,39 @@ async function run() {
       const result=await offers.findOne(query)
       res.json(result)
     })
+    app.post("/offers",async(req,res)=>{
+      const item=req.body
+      const result=await offers.insertOne(item)
+      res.json(result)
+    })
+    app.put("/offers/update/:id",async(req,res)=>{
+const id=req.params.id
+const filter={_id:ObjectId(id)}
+const item=req.body
+const option={upsert:true}
+const updateDocs={
+$set:{
+  title:item.title,
+  location:item.location,
+  price:item.price,
+  groupSize:item.groupSize,
+  duration:item.duration,
+photo:item.photo,
+tourType:item.tourType,
+introduction:item.introduction,
+departureTime:item.departureTime,
+returnTime:item.returnTime,
+}
+}
+const result=await offers.updateOne(filter,updateDocs,option)
+res.json(result)
+    })
+    app.delete("/offers/:id",async(req,res)=>{
+      const id=req.params.id
+    const item={_id:ObjectId(id)}
+  const result=await offers.deleteOne(item)
+  res.json(result) 
+  })
     } finally {
     //   await client.close();
     }
