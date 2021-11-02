@@ -57,6 +57,25 @@ async function run() {
       const booking=await bookings.find({}).toArray()
       res.json(booking)
     })
+    app.get("/booking/:id",async(req,res)=>{
+      const id=req.params.id
+      const query={_id:ObjectId(id)}
+      const booking=await bookings.findOne(query)
+      res.json(booking)
+    })
+    app.put("/booking/:id",async(req,res)=>{
+      const id=req.params.id
+      const filter={_id:ObjectId(id)}
+      const item=req.body
+      const option={upsert:true}
+      const updateDocs={
+      $set:{
+       status:item.status
+      }
+      }
+      const booking=await bookings.updateOne(filter,updateDocs,option)
+      res.json(booking)
+          })
     app.get("/gallery",async(req,res)=>{
       const result=await gallery.find({}).toArray()
       res.json(result)
@@ -103,6 +122,7 @@ returnTime:item.returnTime,
 const result=await offers.updateOne(filter,updateDocs,option)
 res.json(result)
     })
+  
     app.delete("/offers/:id",async(req,res)=>{
       const id=req.params.id
     const item={_id:ObjectId(id)}
