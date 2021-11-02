@@ -31,8 +31,18 @@ async function run() {
       
     app.get("/offers",async(req,res)=>{
       const count=await offers.find({}).count()
+      const page=req.query.page
+      const size=parseInt(req.query.size)
+      let offer;
+      if(page){
+         offer=await offers.find({}).skip(page*size).limit(size).toArray()
 
-      const offer=await offers.find({}).toArray()
+      }
+      else(
+       offer=await offers.find({}).toArray()
+
+      )
+      // console.log(products.length)
       res.json({
         count,
         offer
