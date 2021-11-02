@@ -28,6 +28,7 @@ async function run() {
       const banner = database.collection("banner");
       const gallery = database.collection("gallery");
       const tourTeam = database.collection("tour-team");
+      const bookings = database.collection("booking");
       
     app.get("/offers",async(req,res)=>{
       const count=await offers.find({}).count()
@@ -52,6 +53,10 @@ async function run() {
       const result=await banner.find({}).toArray()
       res.json(result)
     })
+    app.get("/booking",async(req,res)=>{
+      const booking=await bookings.find({}).toArray()
+      res.json(booking)
+    })
     app.get("/gallery",async(req,res)=>{
       const result=await gallery.find({}).toArray()
       res.json(result)
@@ -70,6 +75,11 @@ async function run() {
       const item=req.body
       const result=await offers.insertOne(item)
       res.json(result)
+    })
+    app.post("/booking",async(req,res)=>{
+      const item=req.body
+      const booking=await bookings.insertOne(item)
+      res.json(booking)
     })
     app.put("/offers/update/:id",async(req,res)=>{
 const id=req.params.id
