@@ -63,6 +63,12 @@ async function run() {
       const booking=await bookings.findOne(query)
       res.json(booking)
     })
+    app.delete("/booking/:id",async(req,res)=>{
+      const id=req.params.id
+    const item={_id:ObjectId(id)}
+  const booking=await bookings.deleteOne(item)
+  res.json(booking) 
+  })
     app.put("/booking/:id",async(req,res)=>{
       const id=req.params.id
       const filter={_id:ObjectId(id)}
