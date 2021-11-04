@@ -63,6 +63,13 @@ async function run() {
       const booking=await bookings.findOne(query)
       res.json(booking)
     })
+    app.get("/booking/:email",async(req,res)=>{
+      const email=req.params.email
+      const query={email:email}
+      const booking=await bookings.find(query).toArray
+      console.log(booking)
+      res.json(booking)
+    })
     app.delete("/booking/:id",async(req,res)=>{
       const id=req.params.id
     const item={_id:ObjectId(id)}
