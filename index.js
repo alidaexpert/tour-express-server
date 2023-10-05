@@ -2,12 +2,21 @@ const express=require("express")
 const cors=require("cors")
 const {MongoClient}=require("mongodb")
 const ObjectId=require("mongodb").ObjectId
-require("dotenv").config()
+require("dotenv").config();
+var admin = require("firebase-admin");
 const app=express()
 const port=process.env.PORT || 5000
 
 app.use(express.json())
 app.use(cors())
+
+
+//firebase admin authirized
+var serviceAccount = require(process.env.FIREBASE_ADMIN);
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount)
+});
+
 
 app.get("/",(req,res)=>{
     res.send("Successfully Run The Node And Express")
@@ -19,6 +28,23 @@ app.get("/check",(req,res)=>{
 // Mongo connect 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.uwcfz.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`;
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+
+
+
+async function verifyToken(req,res,next){
+  if(req.headers?.authorization?.startsWith("Bearer ")){
+    const idToken=req.headers.authorization.split("Bearer ")[1]
+    try{
+const decodeUser=await admin.auth().verifyIdToken(idToken)
+  req.decodeUserEmail=decodeUser.email
+  // console.log(req.decodeUserEmail)
+    }
+    catch{
+
+    }
+  }
+  next()
+}
 
 async function run() {
     try {
@@ -76,11 +102,17 @@ async function run() {
   const booking=await bookings.deleteOne(item)
   res.json(booking) 
   })
-    app.get("/myorder/:email",async(req,res)=>{
+    app.get("/myorder/:email",verifyToken,async(req,res)=>{
       const email=req.params.email
+      // console.log(req.decodeUserEmail)
+      if(req.decodeUserEmail===email){
     const query={email:email}
-  const booking=await bookings.find(query).toArray()
-  res.json(booking) 
+    const booking=await bookings.find(query).toArray()
+    res.json(booking) 
+   }
+   else{
+     res.status(401).json({Message:"This is invalid authirized"})
+   }
   })
     app.put("/booking/:id",async(req,res)=>{
       const id=req.params.id
